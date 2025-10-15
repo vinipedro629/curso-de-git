@@ -2,3 +2,5 @@ git add .
 git commit =m "msg"
 git checkout "6 digitos"
 teste
+teste2
+teste 3
