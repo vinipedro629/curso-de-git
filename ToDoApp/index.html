@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ToDoApp - Agenda de Tarefas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>ToDoApp — Agenda de Tarefas</h1>
+        <p>Cadastre, edite e organize suas tarefas. Salvas no seu navegador.</p>
+      </div>
+      <div class="badge" id="countBadge">0 pendentes</div>
+    </header>
+
+    <div class="card">
+      <div class="top">
+        <form id="taskForm" class="form" onsubmit="return false">
+          <input type="hidden" id="taskId" />
+          <input id="title" type="text" placeholder="Título (obrigatório)" required />
+          <input id="date" type="date" required />
+          <input id="status" type="hidden" value="Pendente" />
+          <textarea id="description" placeholder="Descrição (opcional)"></textarea>
+          <button class="btn" id="saveBtn">Salvar</button>
+          <button class="btn ghost" id="clearBtn" type="button">Limpar</button>
+        </form>
+        <div class="controls">
+          <div class="filters" role="tablist" aria-label="Filtros">
+            <button data-filter="" class="active">Todas</button>
+            <button data-filter="Pendente">Pendentes</button>
+            <button data-filter="Concluída">Concluídas</button>
+          </div>
+          <select id="sort" title="Ordenar por">
+            <option value="date_asc">Data ↑</option>
+            <option value="date_desc">Data ↓</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="list" id="taskList">
+        <!-- tarefas aparecerão aqui -->
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:13px">Dicas: clique no ícone ✅ para marcar concluído; use ✏️ para editar e 🗑️ para remover.</div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
