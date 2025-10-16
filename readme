@@ -3,4 +3,6 @@ git commit =m "msg"
 git checkout "6 digitos" "Voltar pro presente ou passado"
 git checkout master "voltar pro futuro"
 git branch "pagina-de-servicos"
+
 git merge "pagina-de-servicos"
+
