@@ -6,3 +6,4 @@ git branch "pagina-de-servicos"
 
 git merge "pagina-de-servicos"
 git push origin main
+git pull origin
