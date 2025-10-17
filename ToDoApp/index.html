@@ -32,10 +32,14 @@
         </form>
         <div class="controls">
           <input id="search" type="search" placeholder="Buscar título ou descrição" style="padding:8px;border-radius:8px;border:1px solid #e6edf7;margin-right:8px" />
-          <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Alternar tema">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="label">Tema</span>
-          </button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Alternar tema">
+              <span class="dot" aria-hidden="true"></span>
+              <span class="label">Tema</span>
+            </button>
+            <button class="btn ghost" id="setLight" data-theme="light" title="Tema claro">Claro</button>
+            <button class="btn ghost" id="setDark" data-theme="dark" title="Tema escuro">Escuro</button>
+          </div>
           <div class="filters" role="tablist" aria-label="Filtros">
             <button data-filter="" class="active">Todas</button>
             <button data-filter="Pendente">Pendentes</button>

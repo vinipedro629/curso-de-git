@@ -335,6 +335,8 @@ load();
 // ----- Theme (light / dark) support -----
 const THEME_KEY = 'todoapp.theme'; // 'light' | 'dark'
 const themeToggleBtn = document.getElementById('themeToggle');
+const setLightBtn = document.getElementById('setLight');
+const setDarkBtn = document.getElementById('setDark');
 
 function applyTheme(theme){
   const root = document.documentElement;
@@ -377,6 +379,15 @@ if(themeToggleBtn){
     showToast('Tema: ' + (next==='dark' ? 'Escuro' : 'Claro'), 'success');
   });
 }
+
+// explicit set buttons
+function setTheme(theme){
+  try{ localStorage.setItem(THEME_KEY, theme); }catch(e){}
+  applyTheme(theme);
+}
+
+if(setLightBtn) setLightBtn.addEventListener('click', ()=>{ setTheme('light'); showToast('Tema: Claro', 'success'); });
+if(setDarkBtn) setDarkBtn.addEventListener('click', ()=>{ setTheme('dark'); showToast('Tema: Escuro', 'success'); });
 
 initTheme();
 
