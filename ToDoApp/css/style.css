@@ -16,13 +16,17 @@ header h1{margin:0;font-size:20px;color:#0f172a}
 header p{margin:0;color:var(--muted);font-size:13px}
 .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
 .top{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.top{flex-wrap:wrap}
 .form{display:flex;gap:8px;flex-wrap:wrap}
 input[type=text], input[type=date], textarea, select{padding:8px 10px;border:1px solid #e6edf7;border-radius:8px;font-size:14px}
 textarea{min-height:60px;resize:vertical}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:0;background:var(--primary);color:white;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid #e6edf7}
 .btn.warn{background:var(--accent)}
-.controls{display:flex;gap:8px;align-items:center}
+.controls{display:flex;gap:8px;align-items:center;min-width:0}
+.tool-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-left:8px}
+.tool-actions{max-width:60%;overflow-wrap:break-word}
+.small-label{font-size:12px;margin-left:6px;display:flex;align-items:center;gap:6px}
 .filters{display:flex;gap:6px}
 .filters button{padding:6px 10px;border-radius:999px;border: none;background:#f3f4f6;color:#374151;cursor:pointer}
 .filters button.active{background:var(--primary);color:white}
