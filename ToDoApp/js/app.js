@@ -11,6 +11,12 @@ const completedListEl = document.getElementById('completedList');
 const countBadge = document.getElementById('countBadge');
 const filters = document.querySelectorAll('.filters button');
 const sortSelect = document.getElementById('sort');
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const importFile = document.getElementById('importFile');
+const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+const toggleCompletedBtn = document.getElementById('toggleCompletedBtn');
+const toastContainer = document.getElementById('toastContainer');
 
 // Estado local
 let tasks = [];
@@ -39,6 +45,11 @@ function clearForm(){
   descInput.value='';
   statusInput.value='Pendente';
   saveBtn.textContent = 'Salvar';
+  // limpar mensagens de validação
+  const titleErr = document.getElementById('titleError');
+  const dateErr = document.getElementById('dateError');
+  if(titleErr) titleErr.textContent = '';
+  if(dateErr) dateErr.textContent = '';
 }
 
 function addOrUpdateTask(){
@@ -46,8 +57,13 @@ function addOrUpdateTask(){
   const date = dateInput.value;
   const desc = descInput.value.trim();
   const status = statusInput.value || 'Pendente';
-  if(!title){ alert('Título é obrigatório'); return }
-  if(!date){ alert('Data é obrigatória'); return }
+  // validação inline
+  let ok = true;
+  const titleErr = document.getElementById('titleError');
+  const dateErr = document.getElementById('dateError');
+  if(!title){ if(titleErr) titleErr.textContent = 'Título obrigatório'; ok=false } else if(titleErr) titleErr.textContent = '';
+  if(!date){ if(dateErr) dateErr.textContent = 'Data obrigatória'; ok=false } else if(dateErr) dateErr.textContent = '';
+  if(!ok){ showToast('Preencha os campos obrigatórios', 'warn'); return }
   const existingId = taskIdInput.value;
   if(existingId){
     const idx = tasks.findIndex(t=>t.id===existingId);
@@ -63,6 +79,7 @@ function addOrUpdateTask(){
   saveAll();
   render();
   clearForm();
+  showToast(existingId ? 'Tarefa atualizada' : 'Tarefa criada', 'success');
 }
 
 function deleteTask(id){
@@ -70,6 +87,7 @@ function deleteTask(id){
   tasks = tasks.filter(t=>t.id!==id);
   saveAll();
   render();
+  showToast('Tarefa removida', 'warn');
 }
 
 function editTask(id){
@@ -90,6 +108,7 @@ function toggleStatus(id){
   tasks[idx].status = tasks[idx].status === 'Pendente' ? 'Concluída' : 'Pendente';
   saveAll();
   render();
+  showToast('Status alterado', 'success');
 }
 
 function applyFilter(list){
@@ -125,7 +144,10 @@ function render(){
     taskListEl.innerHTML = '<div class="muted">Nenhuma tarefa pendente.</div>';
   } else {
     for(const t of pending){
-      taskListEl.appendChild(renderTaskItem(t));
+      const el = renderTaskItem(t);
+      el.classList.add('added');
+      taskListEl.appendChild(el);
+      setTimeout(()=> el.classList.remove('added'), 300);
     }
   }
 
@@ -136,7 +158,8 @@ function render(){
       completedListEl.innerHTML = '<div class="muted">Nenhuma tarefa concluída.</div>';
     } else {
       for(const t of completed){
-        completedListEl.appendChild(renderTaskItem(t));
+        const el = renderTaskItem(t);
+        completedListEl.appendChild(el);
       }
     }
   }
@@ -203,6 +226,51 @@ const clearBtn = document.getElementById('clearBtn');
 taskForm.addEventListener('submit', (e)=>{ e.preventDefault(); addOrUpdateTask(); });
 clearBtn.addEventListener('click', clearForm);
 
+if(exportBtn) exportBtn.addEventListener('click', ()=>{
+  const data = JSON.stringify(tasks, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'todo-export.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Exportado arquivo JSON', 'success');
+});
+
+if(importBtn && importFile){
+  importBtn.addEventListener('click', ()=> importFile.click());
+  importFile.addEventListener('change', (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const arr = JSON.parse(e.target.result);
+        if(Array.isArray(arr)){
+          tasks = arr; saveAll(); render(); showToast('Importado com sucesso', 'success');
+        } else showToast('Arquivo inválido', 'error');
+      }catch(err){ showToast('Erro ao importar', 'error'); }
+    };
+    reader.readAsText(f);
+    importFile.value = '';
+  });
+}
+
+if(clearCompletedBtn) clearCompletedBtn.addEventListener('click', ()=>{
+  if(!confirm('Remover todas as tarefas concluídas?')) return;
+  tasks = tasks.filter(t=>t.status !== 'Concluída');
+  saveAll(); render(); showToast('Concluídas removidas', 'warn');
+});
+
+if(toggleCompletedBtn){
+  toggleCompletedBtn.addEventListener('click', ()=>{
+    const sec = document.querySelector('.completed-section');
+    if(!sec) return;
+    sec.classList.toggle('collapsed');
+    showToast(sec.classList.contains('collapsed') ? 'Concluídas ocultas' : 'Concluídas mostradas', 'success');
+  });
+}
+
 filters.forEach(f=> f.addEventListener('click', ()=>{
   filters.forEach(x=>x.classList.remove('active'));
   f.classList.add('active');
@@ -214,3 +282,18 @@ sortSelect.addEventListener('change', ()=> render());
 
 // inicializar
 load();
+
+// toast helper
+function showToast(message, type=''){
+  if(!toastContainer) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type?type:'');
+  el.textContent = message;
+  toastContainer.appendChild(el);
+  // force reflow to allow animation
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=> el.remove(), 300);
+  }, 2800);
+}

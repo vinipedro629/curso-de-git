@@ -18,10 +18,12 @@
 
     <div class="card">
       <div class="top">
-  <form id="taskForm" class="form">
+        <form id="taskForm" class="form">
           <input type="hidden" id="taskId" />
           <input id="title" type="text" placeholder="Título (obrigatório)" required />
+          <div class="field-error" id="titleError" aria-live="polite"></div>
           <input id="date" type="date" required />
+          <div class="field-error" id="dateError" aria-live="polite"></div>
           <input id="status" type="hidden" value="Pendente" />
           <textarea id="description" placeholder="Descrição (opcional)"></textarea>
           <button class="btn" id="saveBtn">Salvar</button>
@@ -37,6 +39,13 @@
             <option value="date_asc">Data ↑</option>
             <option value="date_desc">Data ↓</option>
           </select>
+          <div style="display:flex;gap:6px;margin-left:8px;align-items:center">
+            <button class="btn ghost" id="exportBtn" title="Exportar tarefas">Exportar</button>
+            <button class="btn ghost" id="importBtn" title="Importar tarefas">Importar</button>
+            <input id="importFile" type="file" accept="application/json" style="display:none" />
+            <button class="btn ghost" id="clearCompletedBtn" title="Remover todas concluídas">Limpar concl.</button>
+            <button class="btn ghost" id="toggleCompletedBtn" title="Mostrar/ocultar concluídas">Ocultar/Mostrar concluídas</button>
+          </div>
         </div>
       </div>
 
@@ -57,6 +66,8 @@
       </div>
     </div>
   </div>
+
+  <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <script src="js/app.js"></script>
 </body>
