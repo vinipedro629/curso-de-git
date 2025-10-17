@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ToDoApp - Agenda de Tarefas</title>
+  <link rel="manifest" href="/ToDoApp/manifest.json">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -30,6 +31,8 @@
           <button class="btn ghost" id="clearBtn" type="button">Limpar</button>
         </form>
         <div class="controls">
+          <input id="search" type="search" placeholder="Buscar título ou descrição" style="padding:8px;border-radius:8px;border:1px solid #e6edf7;margin-right:8px" />
+          <button class="btn ghost" id="themeToggle" title="Alternar tema">Tema</button>
           <div class="filters" role="tablist" aria-label="Filtros">
             <button data-filter="" class="active">Todas</button>
             <button data-filter="Pendente">Pendentes</button>
