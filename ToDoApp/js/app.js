@@ -21,6 +21,8 @@ const toastContainer = document.getElementById('toastContainer');
 // Estado local
 let tasks = [];
 let currentFilter = '';
+// buffer para desfazer ações (undo)
+let undoBuffer = null;
 
 function load(){
   try{
@@ -84,10 +86,17 @@ function addOrUpdateTask(){
 
 function deleteTask(id){
   if(!confirm('Remover essa tarefa?')) return;
+  const removed = tasks.find(t=>t.id===id);
   tasks = tasks.filter(t=>t.id!==id);
   saveAll();
   render();
-  showToast('Tarefa removida', 'warn');
+  // configura undo
+  undoBuffer = { type: 'delete', data: removed };
+  showToastWithUndo('Tarefa removida', 'warn', ()=>{
+    if(undoBuffer && undoBuffer.type==='delete'){
+      tasks.push(undoBuffer.data); saveAll(); render(); undoBuffer = null; showToast('Ação desfeita', 'success');
+    }
+  });
 }
 
 function editTask(id){
@@ -247,7 +256,18 @@ if(importBtn && importFile){
       try{
         const arr = JSON.parse(e.target.result);
         if(Array.isArray(arr)){
-          tasks = arr; saveAll(); render(); showToast('Importado com sucesso', 'success');
+          const replaceBox = document.getElementById('importReplace');
+          const replace = replaceBox ? replaceBox.checked : true;
+          if(replace){
+            tasks = arr; saveAll(); render(); showToast('Importado (substituído)', 'success');
+          } else {
+            // merge by id
+            const existing = new Set(tasks.map(t=>t.id));
+            const toAdd = arr.filter(a=> !existing.has(a.id));
+            if(toAdd.length>0){
+              tasks = tasks.concat(toAdd); saveAll(); render(); showToast('Importado (mesclado)', 'success');
+            } else showToast('Nada novo para importar', 'warn');
+          }
         } else showToast('Arquivo inválido', 'error');
       }catch(err){ showToast('Erro ao importar', 'error'); }
     };
@@ -258,8 +278,16 @@ if(importBtn && importFile){
 
 if(clearCompletedBtn) clearCompletedBtn.addEventListener('click', ()=>{
   if(!confirm('Remover todas as tarefas concluídas?')) return;
+  const removed = tasks.filter(t=>t.status==='Concluída');
+  if(removed.length===0){ showToast('Nenhuma concluída', 'warn'); return }
   tasks = tasks.filter(t=>t.status !== 'Concluída');
-  saveAll(); render(); showToast('Concluídas removidas', 'warn');
+  saveAll(); render();
+  undoBuffer = { type: 'clearCompleted', data: removed };
+  showToastWithUndo('Concluídas removidas', 'warn', ()=>{
+    if(undoBuffer && undoBuffer.type==='clearCompleted'){
+      tasks = tasks.concat(undoBuffer.data); saveAll(); render(); undoBuffer = null; showToast('Ação desfeita', 'success');
+    }
+  });
 });
 
 if(toggleCompletedBtn){
@@ -297,3 +325,26 @@ function showToast(message, type=''){
     setTimeout(()=> el.remove(), 300);
   }, 2800);
 }
+
+// toast with undo action (button)
+function showToastWithUndo(message, type='', undoCb){
+  if(!toastContainer) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type?type:'');
+  const span = document.createElement('span'); span.textContent = message;
+  const btn = document.createElement('button'); btn.className = 'undo'; btn.textContent = 'Desfazer';
+  btn.onclick = ()=>{ undoCb && undoCb(); };
+  el.appendChild(span); el.appendChild(btn);
+  toastContainer.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=> el.remove(), 300);
+    undoBuffer = null;
+  }, 4000);
+}
+
+// Esc para limpar o formulário
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') clearForm();
+});

@@ -40,6 +40,10 @@ textarea{min-height:60px;resize:vertical}
 .toast.success{background:linear-gradient(90deg,#10b981,#059669)}
 .toast.warn{background:linear-gradient(90deg,#f59e0b,#f97316)}
 .toast.error{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.toast .undo{margin-left:10px;background:transparent;border:0;color:rgba(255,255,255,0.95);text-decoration:underline;cursor:pointer;font-weight:600}
+
+/* small button tweaks */
+.btn.ghost{padding:6px 8px;font-size:13px}
 
 /* collapse */
 .completed-section.collapsed .list{display:none}
