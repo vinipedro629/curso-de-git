@@ -6,15 +6,21 @@
   --danger:#ef4444;
   --muted:#6b7280;
   --glass: rgba(255,255,255,0.6);
+  /* theme variables (defaults for light) */
+  --border: #e6edf7;
+  --shadow: rgba(15,23,42,0.08);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,var(--bg),#e9eef8);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+/* smooth transition when theme changes */
+body{transition:background-color 220ms ease, color 220ms ease}
 .container{width:100%;max-width:980px}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 header h1{margin:0;font-size:20px;color:#0f172a}
 header p{margin:0;color:var(--muted);font-size:13px}
 .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
+.card{border:1px solid var(--border)}
 .top{display:flex;gap:12px;align-items:center;margin-bottom:14px}
 .top{flex-wrap:wrap}
 .form{display:flex;gap:8px;flex-wrap:wrap}
@@ -26,6 +32,33 @@ textarea{min-height:60px;resize:vertical}
 .controls{display:flex;gap:8px;align-items:center;min-width:0}
 .tool-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-left:8px}
 .tool-actions{max-width:60%;overflow-wrap:break-word}
+
+/* Theme classes */
+.theme-light{
+  --bg:#f7fafc;
+  --card:#ffffff;
+  --primary:#0ea5e9;
+  --accent:#16a34a;
+  --muted:#6b7280;
+  --border:#e6edf7;
+  --shadow:rgba(15,23,42,0.08);
+  color-scheme: light;
+}
+
+.theme-dark{
+  --bg:#071127;
+  --card:#071226;
+  --primary:#60a5fa;
+  --accent:#fb7185;
+  --muted:#9aa6b2;
+  --border:#0f1724;
+  --shadow: rgba(2,6,23,0.6);
+  color-scheme: dark;
+}
+
+/* Theme toggle button */
+.theme-toggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--border);padding:6px 8px;border-radius:8px;cursor:pointer;color:var(--muted)}
+.theme-toggle .dot{width:16px;height:16px;border-radius:50%;background:var(--primary);display:inline-block}
 .small-label{font-size:12px;margin-left:6px;display:flex;align-items:center;gap:6px}
 .filters{display:flex;gap:6px}
 .filters button{padding:6px 10px;border-radius:999px;border: none;background:#f3f4f6;color:#374151;cursor:pointer}
