@@ -67,12 +67,6 @@ function addOrUpdateTask(){
   if(!title){ if(titleErr) titleErr.textContent = 'Título obrigatório'; ok=false } else if(titleErr) titleErr.textContent = '';
   if(!date){ if(dateErr) dateErr.textContent = 'Data obrigatória'; ok=false } else if(dateErr) dateErr.textContent = '';
   if(!ok){ showToast('Preencha os campos obrigatórios', 'warn'); return }
-    // Register service worker for PWA offline support if available
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/ToDoApp/sw.js').then(reg => {
-        console.log('Service Worker registered', reg);
-      }).catch(err => console.warn('SW register failed', err));
-    }
   const existingId = taskIdInput.value;
   if(existingId){
     const idx = tasks.findIndex(t=>t.id===existingId);
@@ -390,6 +384,15 @@ if(setLightBtn) setLightBtn.addEventListener('click', ()=>{ setTheme('light'); s
 if(setDarkBtn) setDarkBtn.addEventListener('click', ()=>{ setTheme('dark'); showToast('Tema: Escuro', 'success'); });
 
 initTheme();
+
+// Register service worker (relative path) — run once
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    console.log('SW registered:', reg.scope);
+  }).catch(err=>{
+    console.warn('SW register failed', err);
+  });
+}
 
 // toast helper
 function showToast(message, type=''){
