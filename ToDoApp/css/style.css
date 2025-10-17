@@ -27,6 +27,8 @@ textarea{min-height:60px;resize:vertical}
 .filters button{padding:6px 10px;border-radius:999px;border: none;background:#f3f4f6;color:#374151;cursor:pointer}
 .filters button.active{background:var(--primary);color:white}
 .list{margin-top:12px}
+.section-title{margin:12px 0 8px;font-size:15px;color:#0f172a}
+.completed-section{margin-top:10px;padding-top:6px;border-top:1px dashed #eef2fb}
 .task{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;border:1px solid #f0f4fb;background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);margin-bottom:8px}
 .task .left{display:flex;gap:12px;align-items:center}
 .status-btn{width:36px;height:36px;border-radius:8px;border:0;display:inline-grid;place-items:center;cursor:pointer}

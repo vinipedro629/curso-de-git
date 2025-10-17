@@ -7,6 +7,7 @@ const descInput = document.getElementById('description');
 const statusInput = document.getElementById('status');
 const taskIdInput = document.getElementById('taskId');
 const taskListEl = document.getElementById('taskList');
+const completedListEl = document.getElementById('completedList');
 const countBadge = document.getElementById('countBadge');
 const filters = document.querySelectorAll('.filters button');
 const sortSelect = document.getElementById('sort');
@@ -111,69 +112,89 @@ function render(){
   const pendingCount = tasks.filter(t=>t.status==='Pendente').length;
   countBadge.textContent = pendingCount + ' pendentes';
 
+  // separar pendentes e concluidas, respeitando o filtro atual
   let list = applyFilter(tasks);
   list = applySort(list);
 
+  const pending = list.filter(t=>t.status==='Pendente');
+  const completed = list.filter(t=>t.status==='Concluída');
+
+  // render pendentes
   taskListEl.innerHTML = '';
-  if(list.length===0){
-    taskListEl.innerHTML = '<div class="muted">Nenhuma tarefa encontrada.</div>';
-    return;
-  }
-
-  for(const t of list){
-    const div = document.createElement('div');
-    div.className = 'task';
-
-    const left = document.createElement('div');
-    left.className = 'left';
-
-    const statusBtn = document.createElement('button');
-    statusBtn.className = 'status-btn';
-    statusBtn.title = t.status === 'Pendente' ? 'Marcar como Concluída' : 'Marcar como Pendente';
-    statusBtn.innerHTML = t.status==='Pendente' ? '✅' : '↩️';
-    statusBtn.onclick = ()=> toggleStatus(t.id);
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = t.title;
-    const date = document.createElement('div');
-    date.className = 'date';
-    date.textContent = (new Date(t.date)).toLocaleDateString();
-    if(t.status === 'Concluída'){
-      title.classList.add('strike');
+  if(pending.length===0){
+    taskListEl.innerHTML = '<div class="muted">Nenhuma tarefa pendente.</div>';
+  } else {
+    for(const t of pending){
+      taskListEl.appendChild(renderTaskItem(t));
     }
-
-    meta.appendChild(title);
-    meta.appendChild(date);
-
-    left.appendChild(statusBtn);
-    left.appendChild(meta);
-
-    const actions = document.createElement('div');
-    actions.className = 'actions';
-
-    const editBtn = document.createElement('button');
-    editBtn.className = 'icon-btn';
-    editBtn.title = 'Editar';
-    editBtn.textContent = '✏️';
-    editBtn.onclick = ()=> editTask(t.id);
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'icon-btn';
-    delBtn.title = 'Excluir';
-    delBtn.textContent = '🗑️';
-    delBtn.onclick = ()=> deleteTask(t.id);
-
-    actions.appendChild(editBtn);
-    actions.appendChild(delBtn);
-
-    div.appendChild(left);
-    div.appendChild(actions);
-
-    taskListEl.appendChild(div);
   }
+
+  // render concluídas
+  if(completedListEl){
+    completedListEl.innerHTML = '';
+    if(completed.length===0){
+      completedListEl.innerHTML = '<div class="muted">Nenhuma tarefa concluída.</div>';
+    } else {
+      for(const t of completed){
+        completedListEl.appendChild(renderTaskItem(t));
+      }
+    }
+  }
+}
+
+function renderTaskItem(t){
+  const div = document.createElement('div');
+  div.className = 'task';
+
+  const left = document.createElement('div');
+  left.className = 'left';
+
+  const statusBtn = document.createElement('button');
+  statusBtn.className = 'status-btn';
+  statusBtn.title = t.status === 'Pendente' ? 'Marcar como Concluída' : 'Marcar como Pendente';
+  statusBtn.innerHTML = t.status==='Pendente' ? '✅' : '↩️';
+  statusBtn.onclick = ()=> toggleStatus(t.id);
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  const title = document.createElement('div');
+  title.className = 'title';
+  title.textContent = t.title;
+  const date = document.createElement('div');
+  date.className = 'date';
+  date.textContent = (new Date(t.date)).toLocaleDateString();
+  if(t.status === 'Concluída'){
+    title.classList.add('strike');
+  }
+
+  meta.appendChild(title);
+  meta.appendChild(date);
+
+  left.appendChild(statusBtn);
+  left.appendChild(meta);
+
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+
+  const editBtn = document.createElement('button');
+  editBtn.className = 'icon-btn';
+  editBtn.title = 'Editar';
+  editBtn.textContent = '✏️';
+  editBtn.onclick = ()=> editTask(t.id);
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'icon-btn';
+  delBtn.title = 'Excluir';
+  delBtn.textContent = '🗑️';
+  delBtn.onclick = ()=> deleteTask(t.id);
+
+  actions.appendChild(editBtn);
+  actions.appendChild(delBtn);
+
+  div.appendChild(left);
+  div.appendChild(actions);
+
+  return div;
 }
 
 // eventos
