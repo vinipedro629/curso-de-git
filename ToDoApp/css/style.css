@@ -1,8 +1,8 @@
 :root{
-  --bg:#f4f7fb;
+  --bg:#f7fafc;
   --card:#ffffff;
-  --primary:#2563eb;
-  --accent:#10b981;
+  --primary:#0ea5e9; /* azul mais suave */
+  --accent:#16a34a; /* verde */
   --danger:#ef4444;
   --muted:#6b7280;
   --glass: rgba(255,255,255,0.6);
@@ -44,6 +44,12 @@ textarea{min-height:60px;resize:vertical}
 
 /* small button tweaks */
 .btn.ghost{padding:6px 8px;font-size:13px}
+
+/* undo panel */
+.undo-panel{background:rgba(15,23,42,0.85);color:#fff;padding:8px;border-radius:8px;min-width:220px}
+.undo-item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,0.02);margin-bottom:6px;font-size:13px}
+.undo-item small{color:rgba(255,255,255,0.8);font-size:12px}
+.undo-item button{background:transparent;border:0;color:#7ee3b9;cursor:pointer;font-weight:600}
 
 /* collapse */
 .completed-section.collapsed .list{display:none}

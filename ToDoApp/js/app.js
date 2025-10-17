@@ -22,7 +22,8 @@ const toastContainer = document.getElementById('toastContainer');
 let tasks = [];
 let currentFilter = '';
 // buffer para desfazer ações (undo)
-let undoBuffer = null;
+// pilha para desfazer ações (undo)
+let undoStack = [];
 
 function load(){
   try{
@@ -90,11 +91,14 @@ function deleteTask(id){
   tasks = tasks.filter(t=>t.id!==id);
   saveAll();
   render();
-  // configura undo
-  undoBuffer = { type: 'delete', data: removed };
+  // push undo action
+  undoStack.push({ type:'delete', data: removed });
+  updateUndoPanel();
   showToastWithUndo('Tarefa removida', 'warn', ()=>{
-    if(undoBuffer && undoBuffer.type==='delete'){
-      tasks.push(undoBuffer.data); saveAll(); render(); undoBuffer = null; showToast('Ação desfeita', 'success');
+    const action = undoStack.pop();
+    updateUndoPanel();
+    if(action && action.type==='delete'){
+      tasks.push(action.data); saveAll(); render(); showToast('Ação desfeita', 'success');
     }
   });
 }
@@ -261,9 +265,17 @@ if(importBtn && importFile){
           if(replace){
             tasks = arr; saveAll(); render(); showToast('Importado (substituído)', 'success');
           } else {
-            // merge by id
-            const existing = new Set(tasks.map(t=>t.id));
-            const toAdd = arr.filter(a=> !existing.has(a.id));
+            // merge by id or (optionally) by title
+            const existingIds = new Set(tasks.map(t=>t.id));
+            const byTitle = document.getElementById('importByTitle');
+            const existingTitles = new Set(tasks.map(t=>t.title.toLowerCase()));
+            const toAdd = arr.filter(a=>{
+              if(existingIds.has(a.id)) return false;
+              if(byTitle && byTitle.checked){
+                if(existingTitles.has((a.title||'').toLowerCase())) return false;
+              }
+              return true;
+            });
             if(toAdd.length>0){
               tasks = tasks.concat(toAdd); saveAll(); render(); showToast('Importado (mesclado)', 'success');
             } else showToast('Nada novo para importar', 'warn');
@@ -282,10 +294,13 @@ if(clearCompletedBtn) clearCompletedBtn.addEventListener('click', ()=>{
   if(removed.length===0){ showToast('Nenhuma concluída', 'warn'); return }
   tasks = tasks.filter(t=>t.status !== 'Concluída');
   saveAll(); render();
-  undoBuffer = { type: 'clearCompleted', data: removed };
+  undoStack.push({ type:'clearCompleted', data: removed });
+  updateUndoPanel();
   showToastWithUndo('Concluídas removidas', 'warn', ()=>{
-    if(undoBuffer && undoBuffer.type==='clearCompleted'){
-      tasks = tasks.concat(undoBuffer.data); saveAll(); render(); undoBuffer = null; showToast('Ação desfeita', 'success');
+    const action = undoStack.pop();
+    updateUndoPanel();
+    if(action && action.type==='clearCompleted'){
+      tasks = tasks.concat(action.data); saveAll(); render(); showToast('Ação desfeita', 'success');
     }
   });
 });
@@ -340,8 +355,51 @@ function showToastWithUndo(message, type='', undoCb){
   setTimeout(()=>{
     el.classList.remove('show');
     setTimeout(()=> el.remove(), 300);
-    undoBuffer = null;
   }, 4000);
+}
+
+// Undo panel: shows pending undo actions
+function ensureUndoPanel(){
+  let panel = document.getElementById('undoPanel');
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'undoPanel';
+    panel.className = 'undo-panel';
+    if(toastContainer) toastContainer.appendChild(panel);
+  }
+  return panel;
+}
+
+function updateUndoPanel(){
+  const panel = ensureUndoPanel();
+  panel.innerHTML = '';
+  if(undoStack.length===0){ panel.style.display = 'none'; return }
+  panel.style.display = 'block';
+  // show last 5 actions
+  const slice = undoStack.slice(-5).reverse();
+  slice.forEach((act, idx)=>{
+    const row = document.createElement('div'); row.className='undo-item';
+    const txt = document.createElement('div'); txt.innerHTML = act.type === 'delete' ? act.data.title : (act.type==='clearCompleted' ? act.data.length + ' tarefas' : act.type);
+    const small = document.createElement('small'); small.textContent = act.type;
+    const btn = document.createElement('button'); btn.textContent = 'Desfazer';
+    btn.onclick = ()=>{
+      // perform undo for this action
+      // remove from stack
+      const globalIdx = undoStack.lastIndexOf(act);
+      if(globalIdx>-1){
+        const removed = undoStack.splice(globalIdx,1)[0];
+        if(removed.type==='delete'){
+          tasks.push(removed.data); saveAll(); render(); showToast('Ação desfeita', 'success');
+        } else if(removed.type==='clearCompleted'){
+          tasks = tasks.concat(removed.data); saveAll(); render(); showToast('Ação desfeita', 'success');
+        }
+        updateUndoPanel();
+      }
+    };
+    row.appendChild(txt);
+    row.appendChild(btn);
+    panel.appendChild(row);
+  });
 }
 
 // Esc para limpar o formulário
